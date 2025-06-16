@@ -89,7 +89,7 @@ Council" located at entry number 135068, and a catalog redirect for "United
 nations" (with a lowercase N) that redirects to the "United Nations" article.
 
 Optionally, you can cap the number of results and remove redirects using the
-`max_results` and `ignore_redirects` arguments:
+`max_results` and `include_redirects` arguments:
 
 ```python
 search_results = my_archive.search_catalog("united nations", max_results=10, include_redirects=False)
