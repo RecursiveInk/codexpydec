@@ -121,7 +121,7 @@ class CodexDecoder:
                 entry_number = int.from_bytes(
                     entry_bytes[: self.pointer_length], byteorder="little", signed=False
                 )
-                article = self._get_complete_article(entry_title, entry_number)
+                article = self.get_article(entry_title, entry_number)
                 if article is None:
                     continue
                 yield entry_number, article
