@@ -3,9 +3,20 @@ from pathlib import Path
 import zlib
 from .CodexSchema import get_compatible_schema
 
+try:
+    import liblzfse
+
+    LIBLZFSE_AVAILABLE = True
+except ImportError:
+    LIBLZFSE_AVAILABLE = False
+
 
 def _decompress_zlib(block: bytes) -> bytes:
-    return zlib.decompress(block, wbits=-15)
+    return zlib.decompress(block[:-4], wbits=-15)
+
+
+def _decompress_lzfse(block: bytes) -> bytes:
+    return liblzfse.decompress(block[:-4])
 
 
 class CodexDecoder:
@@ -35,6 +46,12 @@ class CodexDecoder:
         )
         if self.compression_algorithm == "ZLIB":
             self._decompress = _decompress_zlib
+        elif self.compression_algorithm == "LZFS":
+            if not LIBLZFSE_AVAILABLE:
+                raise ImportError(
+                    "This archive is compressed with LZFSE but pyliblzfse is not installed. Install with: pip install codexpydec[lzfse]"
+                )
+            self._decompress = _decompress_lzfse
         else:
             raise ValueError(
                 f"Unrecognized compression algorithm: {self.compression_algorithm}"
@@ -374,10 +391,8 @@ class CodexDecoder:
         if entry_number is None:
             return None
         return self.get_article(article_title, entry_number)
-    
-    def get_article(
-        self, article_title: str, entry_number: int
-    ) -> str | None:
+
+    def get_article(self, article_title: str, entry_number: int) -> str | None:
         main_text = self.get_article_by_entry_number(entry_number)
         if main_text is None:
             return None

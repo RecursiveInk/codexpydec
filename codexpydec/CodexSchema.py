@@ -1,4 +1,4 @@
-def get_compatible_schema(major: int, minor: int) -> (dict | None):
+def get_compatible_schema(major: int, minor: int) -> dict | None:
     while minor >= 0:
         version = f"{major}.{minor}"
         if version in CODEX_SCHEMATA:

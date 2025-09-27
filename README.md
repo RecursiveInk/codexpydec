@@ -1,7 +1,11 @@
 # Codex
 
 Codex is an archive format for storing and distributing large-scale
-collections of articles. Codex has four notable features:
+collections of articles. It was designed for the
+[Omnipedia app](https://recursive.ink/omnipedia/), an offline Wikipedia reader
+for iOS.
+
+The Codex format has four notable features:
 
 1. **Block compression.** Articles are grouped together and compressed
 in "blocks" to balance compression ratio with random access speed.
@@ -13,24 +17,31 @@ themselves.
 4. **Incremental updates.** Infrastructure is in place to permit
 incremental updates to articles.
 
-This repository provides a Python implementation of the Codex decoder and
-describes the Codex format.
+This repository provides a reference implementation of the Codex decoder
+(in Python) and describes the Codex format.
 
 
 ## CodexPyDec
 
-CodexPyDec requires Python 3.10 or greater. It has no other dependencies.
+CodexPyDec requires Python 3.10 or greater. It has no required dependencies
+unless you want to access an archive compressed with LZFSE, in which case
+[pyliblzfse](https://github.com/ydkhatri/pyliblzfse) is required.
 
 
 ### Installation
 
-CodexPyDec is available on the Python Package Index and can be installed
-using pip:
+[CodexPyDec is available on the Python Package Index](https://pypi.org/project/codexpydec/)
+and can be installed using pip:
 
 ```bash
-$ pip install codexpydec
+pip install codexpydec
 ```
 
+To install alongside pyliblzfse for LZFSE compression support, use:
+
+```bash
+pip install codexpydec[lzfse]
+```
 
 ### Usage example
 
