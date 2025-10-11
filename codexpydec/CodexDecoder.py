@@ -246,7 +246,7 @@ class CodexDecoder:
         return self._decompress(library_block)
 
     def _recursive_catalog_search(
-        self, search_query: str, low_index: int, high_index: int, prefix_match: bool
+        self, search_query: str, low_index: int, high_index: int
     ) -> int | None:
         if low_index > high_index:
             return None
@@ -255,13 +255,14 @@ class CodexDecoder:
         first_entry_bytes = self._extract_from_data(0, catalog_block)
         first_entry_title = first_entry_bytes[self.pointer_length :].decode("utf-8")
         first_entry_title_lower = first_entry_title.lower()
-        if prefix_match and first_entry_title_lower.startswith(search_query):
-            return middle_catalog_block_index
         if search_query < first_entry_title_lower:
             if middle_catalog_block_index < 1:
-                return None
-            return self._recursive_catalog_search(
-                search_query, low_index, middle_catalog_block_index - 1, prefix_match
+                return 0
+            return (
+                self._recursive_catalog_search(
+                    search_query, low_index, middle_catalog_block_index - 1
+                )
+                or middle_catalog_block_index
             )
         entry_count = int.from_bytes(
             catalog_block[: self.pointer_length], byteorder="little", signed=False
@@ -269,11 +270,12 @@ class CodexDecoder:
         last_entry_bytes = self._extract_from_data(entry_count - 1, catalog_block)
         last_entry_title = last_entry_bytes[self.pointer_length :].decode("utf-8")
         last_entry_title_lower = last_entry_title.lower()
-        if prefix_match and last_entry_title_lower.startswith(search_query):
-            return middle_catalog_block_index
         if search_query > last_entry_title_lower:
-            return self._recursive_catalog_search(
-                search_query, middle_catalog_block_index + 1, high_index, prefix_match
+            return (
+                self._recursive_catalog_search(
+                    search_query, middle_catalog_block_index + 1, high_index
+                )
+                or middle_catalog_block_index
             )
         return middle_catalog_block_index
 
@@ -317,7 +319,7 @@ class CodexDecoder:
             block_number = 0
         else:
             block_number = self._recursive_catalog_search(
-                target_title.lower(), 0, self.n_catalog_blocks - 1, prefix_match=False
+                target_title.lower(), 0, self.n_catalog_blocks - 1
             )
         if block_number is None:
             return None
@@ -345,7 +347,7 @@ class CodexDecoder:
             block_number = 0
         else:
             block_number = self._recursive_catalog_search(
-                search_query_lower, 0, self.n_catalog_blocks - 1, prefix_match=True
+                search_query_lower, 0, self.n_catalog_blocks - 1
             )
         if block_number is None:
             return []
