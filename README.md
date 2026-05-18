@@ -2,7 +2,7 @@
 
 Codex is an archive format for storing and distributing large-scale
 collections of articles. It was designed for the
-[Omnipedia app](https://recursive.ink/omnipedia/), an offline Wikipedia reader
+[Omnipedia app](https://omnipedia.recursive.ink), an offline Wikipedia reader
 for iOS.
 
 The Codex format has four notable features:
@@ -23,8 +23,8 @@ This repository provides a reference implementation of the Codex decoder
 
 ## CodexPyDec
 
-CodexPyDec requires Python 3.10 or greater. It has no required dependencies
-unless you want to access an archive compressed with LZFSE, in which case
+CodexPyDec requires Python 3.10 or greater. It has no other dependencies
+unless you want to access an archive that uses LZFSE compression, in which case
 [pyliblzfse](https://github.com/ydkhatri/pyliblzfse) is required.
 
 
@@ -292,6 +292,6 @@ automatically appended to the bottom of each article.
 
 ## License
 
-© 2025 Recursive Ink Ltd. CodexPyDec is licensed under the terms of the GNU
+© 2026 Recursive Ink Ltd. CodexPyDec is licensed under the terms of the GNU
 General Public License version 3 (GPLv3). By submitting a pull request you
 represent that your contribution can be licensed under GPLv3.
