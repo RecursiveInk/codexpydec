@@ -223,9 +223,9 @@ following table are expressed in bytes.
 | *N* library blocks    | 2      | 228–230 | 16-bit integer. Number of compression blocks that the library is divided into. Must be > 0 and is limited to 65,535. |
 | *N* catalog shards    | 1      | 230–231 | 8-bit integer. Number of shards that the catalog blocks are distributed over. If 0, the catalog is contained in the header shard. Otherwise, the decoder expects to find additional files with with a zero-padded shard number at the end of the file name (e.g. `my_archive.001.codex`). Catalog shards (if any) are numbered from 001 to 00N in the filename (since 000 is reserved for the header shard). |
 | *N* library shards    | 1      | 231–232 | 8-bit integer. Number of shards that the library blocks are distributed over. If 0, the library is contained in the header shard. Otherwise, the decoder expects to find additional files with with a zero-padded shard number at the end of the file name (e.g. `my_archive.002.codex`). Library shards (if any) are numbered sequentially after the catalog shard numbers. The total number of shards – header plus catalog plus library – cannot exceed 256. |
-| Inventory pointer     | 8      | 232–240 | 32-bit integer. Byte offset of the inventory. |
-| Catalog index pointer | 8      | 240–248 | 32-bit integer. Byte offset of the catalog index |
-| Library index pointer | 8      | 248–256 | 32-bit integer. Byte offset of the library index |
+| Inventory pointer     | 8      | 232–240 | 64-bit integer. Byte offset of the inventory. |
+| Catalog index pointer | 8      | 240–248 | 64-bit integer. Byte offset of the catalog index. |
+| Library index pointer | 8      | 248–256 | 64-bit integer. Byte offset of the library index. |
 
 
 ### Inventory
