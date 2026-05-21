@@ -11,6 +11,10 @@ except ImportError:
     LIBLZFSE_AVAILABLE = False
 
 
+def _decompress_none(block: bytes) -> bytes:
+    return block
+
+
 def _decompress_zlib(block: bytes) -> bytes:
     return zlib.decompress(block[:-4], wbits=-15)
 
@@ -44,7 +48,9 @@ class CodexDecoder:
         self.compression_algorithm = self._read_string_field(
             self.schema["compressionAlgorithm"], file_handle
         )
-        if self.compression_algorithm == "ZLIB":
+        if self.compression_algorithm == "NONE":
+            self._decompress = _decompress_none
+        elif self.compression_algorithm == "ZLIB":
             self._decompress = _decompress_zlib
         elif self.compression_algorithm == "LZFS":
             if not LIBLZFSE_AVAILABLE:

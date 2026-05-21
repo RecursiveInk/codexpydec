@@ -211,7 +211,7 @@ following table are expressed in bytes.
 | File signature        | 4      | 0–4     | String. Always set to `CODX` (hex: `43 4f 44 58`). |
 | Major schema version  | 1      | 4–5     | 8-bit integer. Major schema versions indicate breaking changes to the schema.|
 | Minor schema version  | 1      | 5–6     | 8-bit integer. Minor schema versions indicate backward-compatible changes to the schema. |
-| Compression algorithm | 4      | 6–10    | String. Compression algorithm used to compress blocks, typically set to `ZLIB`, `LZ4`, `LZMA`, `LZFS`. Codex does not mandate any particular compression format; however, the Python decoder only decodes ZLIB compressed archives. |
+| Compression algorithm | 4      | 6–10    | String. Compression algorithm used to compress blocks, typically set to `ZLIB`, `LZ4_`, `LZMA`, `LZFS`, or `NONE` (for uncompressed archives). The Codex format does not mandate any particular compression algorithm; however, CodexPyDec currently only supports ZLIB, LZFSE, and uncompressed archives. |
 | Library ID            | 8      | 10–18   | String. Unique identifier for the library that remains fixed across library versions. |
 | Library name          | 64     | 18–82   | String. Descriptive library name. |
 | Library license       | 128    | 82–210  | String. Copyright and licensing information. |
