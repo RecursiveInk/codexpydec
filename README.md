@@ -14,8 +14,8 @@ to allow for partial downloading over unstable connections.
 3. **Isolated title index.** Article titles are stored separately from
 articles to allow for rapid title searches without decompressing the articles
 themselves.
-4. **Incremental updates.** Infrastructure is in place to permit
-incremental updates to articles.
+4. **Incremental updates.** Archives can be efficiently diffed and patched to
+allow for incremental updates to article content.
 
 This repository provides a reference implementation of the Codex decoder
 (in Python) and describes the Codex format.
@@ -30,8 +30,13 @@ unless you want to access an archive that uses LZFSE compression, in which case
 
 ### Installation
 
-[CodexPyDec is available on the Python Package Index](https://pypi.org/project/codexpydec/)
-and can be installed using pip:
+To use CodexPyDec, you will first need access to a Python installation. There
+are many different ways to install Python depending on your needs and setup,
+but if unsure you can use the official installer from [Python.org](https://www.python.org/downloads/).
+
+Once you have a working Python installation, you then need to install
+the CodexPyDec package. [CodexPyDec is available on the Python Package Index](https://pypi.org/project/codexpydec/),
+so usually the most straight-forward way to install it is by using the "pip" tool:
 
 ```bash
 pip install codexpydec
@@ -43,9 +48,22 @@ To install alongside pyliblzfse for LZFSE compression support, use:
 pip install codexpydec[lzfse]
 ```
 
+
+### Preparation
+
+To use CodexPyDec, you will need access to a Codex archive downloaded from
+[Omnipedia](https://omnipedia.recursive.ink). To transfer the archive from
+your iPhone or iPad to your computer, follow [these instructions for Mac](https://support.apple.com/119585)
+or [these instructions for Windows](https://support.apple.com/120402). Codex
+archives are distributed over a large number of files (usually 256 files) with
+names like `enwiki_20260501_complete.000.codex` through `enwiki_20260501_complete.255.codex`.
+You should transfer all of these files to a convenient location (for example,
+a new folder on your desktop).
+
+
 ### Usage example
 
-In your script or Python shell, import `CodexDecoder` from the `codexpydec`
+In a Python script or Python shell, import `CodexDecoder` from the `codexpydec`
 package:
 
 ```python
@@ -134,13 +152,20 @@ article = get_article("United Nations", 1231)
 print(article)
 ```
 
-`get_article()` and `get_article_by_title()` return the full article including
-title and footer. `get_article_by_entry_number()` only returns the main
-article body (without title and footer). `get_article_by_title()` is slower
-because it needs to perform a catalog search to establish the entry number.
-`get_article_by_entry_number()` is faster but does not include the title and
-footer. `get_article()` provides the full article but you need to
-know both title and entry number in advance.
+The methods differ in what content they return:
+
+- `get_article()` and `get_article_by_title()` return the full article including title and footer.
+- `get_article_by_entry_number()` only returns the main article body (without title and footer).
+
+This means the three methods have the following trade-offs:
+
+- `get_article_by_title()` is slower because it needs to perform a catalog search to establish the entry number.
+- `get_article_by_entry_number()` is faster but does not include the title and footer.
+- `get_article()` provides the full article but you need to know both title and entry number in advance.
+
+For simple use cases, the method usually doesn't matter. But, if you're
+extracting large numbers of articles, it's worth considering which option is
+most efficient for your needs.
 
 #### Exporting articles
 
@@ -231,9 +256,11 @@ following table are expressed in bytes.
 ### Inventory
 
 The inventory is a chunk of compressed data of variable length stored in the
-header shard immediately after the 256 bytes described above. It holds a list
-of persistent article IDs (32-bit integers) that are only used during archive
-updates. The inventory is immediately followed by the catalog index.
+header shard immediately after the 256 bytes described above. Uncompressed,
+the inventory is essentially an array of persistent article IDs (32-bit integers;
+4 bytes each). The persistent IDs are ordered numerically and are in the same
+order as the articles in the library. The inventory is primarily used for applying
+incremental updates.
 
 
 ### Catalog index
@@ -278,14 +305,15 @@ yield two substrings: a redirect-from title and a redirect-to title.
 Redirections make it possible for multiple catalog entries (e.g. "UN" and
 "United Nations") to point to the same article.
 
-Catalog entries are arranged in case-insensitive lexicographic order.
+Catalog entries are arranged in case-insensitive lexicographic order suitable
+for binary search.
 
 
 ### Library and library blocks
 
 The library has the same basic structure as the catalog, except that the
 payload of each library block is a concatenation of articles. Articles are
-arranged in arbitrary order. Article 0 – the first article in the first block
+ordered by their persistent ID. Article 0 – the first article in the first block
 of the first shard – is special. It is the **footer text** that is
 automatically appended to the bottom of each article.
 
